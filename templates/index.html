@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Processor</title>
+    <style>
+        /* General reset and styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #2c3e50;
+        }
+
+        p {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input[type="file"] {
+            border: 2px dashed #bdc3c7;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        input[type="file"]:hover {
+            border-color: #3498db;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Python Code Processor</h1>
+        <p>Upload your Python file to remove comments and randomly blanks 10 key words.</p>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".py" required>
+            <button type="submit">Process File</button>
+        </form>
+        <footer>
+            <p>Built with ❤️ using Flask. <a href="https://www.michaelrbparker.com/">Made with ❤️ by Michael Parker</a>.</p>
+        </footer>
+    </div>
+</body>
+</html>
