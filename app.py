@@ -4,26 +4,29 @@ import random
 import os
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-PROCESSED_FOLDER = 'processed'
+UPLOAD_FOLDER = "uploads"
+PROCESSED_FOLDER = "processed"
 
 # Ensure upload and processed folders exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
+
 def remove_comments_and_random_words(input_file, output_file, amount=10):
     try:
-        with open(input_file, 'r') as file:
+        with open(input_file, "r") as file:
             code = file.read()
 
         # Remove single-line comments (`#`) and multi-line comments (`'''` or `"""`)
         # Handle multi-line comments
-        code_no_comments = re.sub(r'(\'\'\'(.*?)\'\'\'|"""(.*?)""")', '', code, flags=re.DOTALL)
+        code_no_comments = re.sub(
+            r'(\'\'\'(.*?)\'\'\'|"""(.*?)""")', "", code, flags=re.DOTALL
+        )
         # Handle single-line comments
-        code_no_comments = re.sub(r'#.*', '', code_no_comments)
+        code_no_comments = re.sub(r"#.*", "", code_no_comments)
 
         # Extract words from the code
-        words = re.findall(r'\b\w+\b', code_no_comments)
+        words = re.findall(r"\b\w+\b", code_no_comments)
 
         # Ensure there are enough words to replace
         if len(words) < amount:
@@ -32,10 +35,12 @@ def remove_comments_and_random_words(input_file, output_file, amount=10):
         # Randomly replace words
         random_words = random.sample(words, amount)
         for word in random_words:
-            code_no_comments = re.sub(rf'\b{re.escape(word)}\b', '_', code_no_comments, count=1)
+            code_no_comments = re.sub(
+                rf"\b{re.escape(word)}\b", "_", code_no_comments, count=1
+            )
 
         # Write processed code to the output file
-        with open(output_file, 'w') as file:
+        with open(output_file, "w") as file:
             file.write(code_no_comments)
 
     except FileNotFoundError:
@@ -43,12 +48,13 @@ def remove_comments_and_random_words(input_file, output_file, amount=10):
     except ValueError as ve:
         raise ValueError(str(ve))
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == 'POST':
+    if request.method == "POST":
         # Handle file upload
-        uploaded_file = request.files['file']
-        if uploaded_file.filename == '':
+        uploaded_file = request.files["file"]
+        if uploaded_file.filename == "":
             return "No file selected.", 400
 
         # Save the uploaded file
@@ -56,7 +62,9 @@ def index():
         uploaded_file.save(input_path)
 
         # Define the output path
-        output_path = os.path.join(PROCESSED_FOLDER, f"processed_{uploaded_file.filename}")
+        output_path = os.path.join(
+            PROCESSED_FOLDER, f"processed_{uploaded_file.filename}"
+        )
 
         try:
             # Process the file
@@ -67,7 +75,8 @@ def index():
         except Exception as e:
             return str(e), 500
 
-    return render_template('index.html')
+    return render_template("index.html")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run(debug=True)
