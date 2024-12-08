@@ -1,24 +1,16 @@
-from flask import Flask, request, render_template, send_file
+from flask import Flask, request, render_template, Response
 import re
 import random
-import os
+import io
 
 app = Flask(__name__)
-UPLOAD_FOLDER = "uploads"
-PROCESSED_FOLDER = "processed"
 
-# Ensure upload and processed folders exist
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(PROCESSED_FOLDER, exist_ok=True)
-
-
-def remove_comments_and_random_words(input_file, output_file, amount=10):
+def remove_comments_and_random_words(input_file, amount=10):
     try:
-        with open(input_file, "r") as file:
-            code = file.read()
+        # Read the file content
+        code = input_file.read().decode("utf-8")
 
         # Remove single-line comments (`#`) and multi-line comments (`'''` or `"""`)
-        # Handle multi-line comments
         code_no_comments = re.sub(
             r'(\'\'\'(.*?)\'\'\'|"""(.*?)""")', "", code, flags=re.DOTALL
         )
@@ -39,15 +31,10 @@ def remove_comments_and_random_words(input_file, output_file, amount=10):
                 rf"\b{re.escape(word)}\b", "_", code_no_comments, count=1
             )
 
-        # Write processed code to the output file
-        with open(output_file, "w") as file:
-            file.write(code_no_comments)
+        return code_no_comments
 
-    except FileNotFoundError:
-        raise FileNotFoundError("The specified input file does not exist.")
     except ValueError as ve:
         raise ValueError(str(ve))
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -57,27 +44,19 @@ def index():
         if uploaded_file.filename == "":
             return "No file selected.", 400
 
-        # Save the uploaded file
-        input_path = os.path.join(UPLOAD_FOLDER, uploaded_file.filename)
-        uploaded_file.save(input_path)
-
-        # Define the output path
-        output_path = os.path.join(
-            PROCESSED_FOLDER, f"processed_{uploaded_file.filename}"
-        )
-
         try:
-            # Process the file
-            remove_comments_and_random_words(input_path, output_path)
-            #remove the input file
-            os.remove(input_path)
-            return send_file(output_path, as_attachment=True)
+            # Process the file content in memory
+            processed_code = remove_comments_and_random_words(uploaded_file.stream)
+
+            # Create a response with the processed content, setting it as an attachment
+            response = Response(processed_code, mimetype="text/plain", content_type="text/plain")
+            response.headers["Content-Disposition"] = "attachment; filename=processed_code.txt"
+            return response
 
         except Exception as e:
             return str(e), 500
 
     return render_template("index.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True)
