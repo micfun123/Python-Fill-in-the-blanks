@@ -49,8 +49,8 @@ def index():
             processed_code = remove_comments_and_random_words(uploaded_file.stream)
 
             # Create a response with the processed content, setting it as an attachment
-            response = Response(processed_code, mimetype="text/plain", content_type="text/plain")
-            response.headers["Content-Disposition"] = "attachment; filename=processed_code.txt"
+            response = Response(processed_code, mimetype="text/plain", content_type="text")
+            response.headers["Content-Disposition"] = "attachment; filename=processed_code.py"
             return response
 
         except Exception as e:
