@@ -69,7 +69,8 @@ def index():
         try:
             # Process the file
             remove_comments_and_random_words(input_path, output_path)
-
+            #remove the input file
+            os.remove(input_path)
             return send_file(output_path, as_attachment=True)
 
         except Exception as e:
