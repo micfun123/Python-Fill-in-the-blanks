@@ -8,14 +8,14 @@ app.secret_key = "your_secret_key_here"  # For session handling
 # Function to remove comments and replace random words with blanks
 def remove_comments_and_random_words(input_file, amount=10):
     try:
-        # Read the file content
         code = input_file.read().decode("utf-8")
 
-        # Remove single-line comments (`#`) and multi-line comments (`'''` or `"""`)
-        code_no_comments = re.sub(
-            r"(\'\'\'(.*?)\'\'\'|\"\"\"(.*?)\"\"\")", "", code, flags=re.DOTALL
-        )
-        code_no_comments = re.sub(r"#.*", "", code_no_comments)
+        # Remove single-line comments (`#`) – Keep indentation intact
+        code_no_comments = re.sub(r"#.*", "", code)
+
+        # Remove multi-line comments (''' or """) using non-greedy matching
+        code_no_comments = re.sub(r"'''(.*?)'''", "", code_no_comments, flags=re.DOTALL)
+        code_no_comments = re.sub(r'"""(.*?)"""', "", code_no_comments, flags=re.DOTALL)
 
         # Extract words from the code
         words = re.findall(r"\b\w+\b", code_no_comments)
@@ -27,6 +27,7 @@ def remove_comments_and_random_words(input_file, amount=10):
         # Randomly replace words
         random_words = random.sample(words, amount)
         for word in random_words:
+            # Replace only the first instance of each word
             code_no_comments = re.sub(
                 rf"\b{re.escape(word)}\b", "____", code_no_comments, count=1
             )
@@ -35,7 +36,6 @@ def remove_comments_and_random_words(input_file, amount=10):
 
     except ValueError as ve:
         raise ValueError(str(ve))
-
 
 
 
