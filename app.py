@@ -20,24 +20,32 @@ def remove_comments_and_random_words(input_file, amount=10):
         # Extract words from the code
         words = re.findall(r"\b\w+\b", code_no_comments)
 
-        # Ensure there are enough words to replace
         if len(words) < amount:
             raise ValueError("The code has fewer than 10 words that can be replaced.")
 
-        # Randomly replace words
-        random_words = random.sample(words, amount)
-        for word in random_words:
-            # Replace only the first instance of each word
-            code_no_comments = re.sub(
-                rf"\b{re.escape(word)}\b", "____", code_no_comments, count=1
-            )
+        # Randomly select words to replace
+        selected_words = random.sample(words, amount)
+        replaced_words = []  # Keep track of replaced words in order
 
-        return code_no_comments, random_words
+        def replace_match(match):
+            word = match.group(0)
+            if word in selected_words:
+                # Replace the word and remove it from the list to avoid duplicate replacements
+                selected_words.remove(word)
+                replaced_words.append(word)
+                return "____"
+            return word
+
+        # Use regex to replace words in order while tracking them
+        code_with_blanks = re.sub(r"\b\w+\b", replace_match, code_no_comments)
+
+        if len(replaced_words) != amount:
+            raise ValueError("Not all selected words were replaced.")
+
+        return code_with_blanks, replaced_words
 
     except ValueError as ve:
         raise ValueError(str(ve))
-
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
